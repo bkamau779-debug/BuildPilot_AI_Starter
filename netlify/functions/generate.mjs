@@ -12,7 +12,7 @@ export default async function handler(request) {
     return json({ error: "Use POST to generate a website." }, 405);
   }
 
-  const apiKey = Netlify.env.get("GEMINI_API_KEY");
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return json({
       error: "AI backend is not configured yet. Add GEMINI_API_KEY in your Netlify site environment variables, then redeploy.",
