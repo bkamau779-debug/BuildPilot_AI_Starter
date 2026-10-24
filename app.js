@@ -62,6 +62,19 @@ function makeZip(fileMap){
   ev.setUint32(0,0x06054b50,true);ev.setUint16(4,0,true);ev.setUint16(6,0,true);ev.setUint16(8,safeFiles.length,true);ev.setUint16(10,safeFiles.length,true);ev.setUint32(12,centralBytes.length,true);ev.setUint32(16,localBytes.length,true);ev.setUint16(20,0,true);
   return new Blob([localBytes,centralBytes,end],{type:"application/zip"});
 }
+function previewHTML(filename){
+  const source=generatedFiles[filename]||"";
+  const bridge='<script>document.addEventListener("click",function(event){var link=event.target.closest("a[href]");if(!link)return;var href=link.getAttribute("href")||"";var match=href.match(/^(index|services|about|contact)\\.html(?:#.*)?$/);if(match){event.preventDefault();parent.postMessage({type:"buildpilot-preview-page",page:match[1]+".html",hash:(href.split("#")[1]||"")},"*");}});<\\/script>';
+  return source.includes("</body>")?source.replace("</body>",bridge+"</body>"):source+bridge;
+}
+window.addEventListener("message",event=>{
+  if(event.source!==preview.contentWindow||!event.data||event.data.type!=="buildpilot-preview-page")return;
+  const page=event.data.page;
+  if(!generatedFiles[page])return;
+  if(pagePicker)pagePicker.value=page;
+  preview.srcdoc=previewHTML(page);
+  if(event.data.hash)setTimeout(()=>{try{preview.contentDocument?.getElementById(event.data.hash)?.scrollIntoView();}catch{}},50);
+});
 function setGeneratedFiles(files){
   generatedFiles=files||{};generatedHTML=generatedFiles["index.html"]||Object.values(generatedFiles)[0]||"";
   const names=Object.keys(generatedFiles);
@@ -71,11 +84,11 @@ function setGeneratedFiles(files){
     pagePicker.hidden=names.length<2;
     pagePicker.value=generatedFiles["index.html"]?"index.html":names[0];
   }
-  preview.srcdoc=generatedHTML;frameBox.classList.add("has-site");
+  preview.srcdoc=previewHTML(pagePicker&&pagePicker.value&&generatedFiles[pagePicker.value]?pagePicker.value:"index.html");frameBox.classList.add("has-site");
   statusText.textContent=names.length>1?"AI website ready · "+names.length+" pages":"Website draft ready";
   copyButton.disabled=!generatedHTML;downloadButton.disabled=!generatedHTML;
 }
-if(pagePicker)pagePicker.addEventListener("change",()=>{const page=generatedFiles[pagePicker.value];if(page)preview.srcdoc=page;});
+if(pagePicker)pagePicker.addEventListener("change",()=>{const page=generatedFiles[pagePicker.value];if(page)preview.srcdoc=previewHTML(pagePicker.value);});
 form.addEventListener("submit",async e=>{
   e.preventDefault();
   const name=clean(document.querySelector("#site-name").value),description=clean(document.querySelector("#description").value),type=document.querySelector("#site-type").value,style=document.querySelector('input[name="style"]:checked').value,email=clean(document.querySelector("#email").value);
