@@ -59,7 +59,7 @@ form.addEventListener("submit",async e=>{
     }catch(error){
       generatedHTML=createSite({name,type,description,style,email});
       const reason=error?.message||"AI service unavailable";
-      message.textContent="Template draft ready. Groq AI isn't connected or isn't available yet ("+reason+"). Add GROQ_API_KEY in Netlify to enable AI generation. Your template builder still works.";
+      message.textContent="A template draft was created because AI generation could not finish: "+reason+" You can try again, or keep working with this template.";
     }
     preview.srcdoc=generatedHTML;frameBox.classList.add("has-site");statusText.textContent=message.textContent.startsWith("Your website was generated")?"AI draft ready":"Template draft ready";
     document.querySelector("#export-title").textContent=name+" — draft ready";
