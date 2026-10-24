@@ -121,8 +121,8 @@ ${html}`
       if (reviewResponse.ok) {
         const reviewResult = await reviewResponse.json().catch(() => ({}));
         let improved = reviewResult?.choices?.[0]?.message?.content?.trim() || "";
-        improved = improved.replace(/^\`\`\`(?:html)?\\s*/i, "").replace(/\\s*\`\`\`$/, "").trim();
-        if (improved.length > 500 && /<!doctype\\s+html|<html[\\s>]/i.test(improved)) {
+        improved = improved.replace(/^```(?:html)?\s*/i, "").replace(/\s*```$/, "").trim();
+        if (improved.length > 500 && /<!doctype\s+html|<html[\s>]/i.test(improved)) {
           html = improved;
         } else {
           console.warn("BuildPilot quality pass returned invalid HTML; using first draft.");
