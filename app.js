@@ -114,7 +114,7 @@ form.addEventListener("submit",async e=>{
     frameBox.scrollIntoView({behavior:"smooth",block:"nearest"});
   }catch(error){
     statusText.textContent="Could not build draft";message.textContent="Something went wrong. Please check the fields and try again.";
-  }finally{button.disabled=false;button.innerHTML="<span>✦</span> Generate website draft <span>→</span>";}
+  }finally{button.disabled=false;button.innerHTML="<span>✦</span> Generate multi-page website <span>→</span>";}
 });
 copyButton.addEventListener("click",async()=>{if(!generatedHTML)return;try{await navigator.clipboard.writeText(generatedHTML);message.textContent="Homepage HTML copied. Other pages are included in the website ZIP export.";}catch{message.textContent="Clipboard access is unavailable here. Use Download website .zip instead."; }});
 downloadButton.addEventListener("click",()=>{
